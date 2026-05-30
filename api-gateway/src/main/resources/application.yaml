@@ -1,19 +1,67 @@
+#server:
+#  port: 8080
+#
+#spring:
+#  application:
+#    name: api-gateway
+#
+#cloud:
+#  gateway:
+#    routes:
+#      - id: user-service
+#        uri: lb://user-service
+#        predicates:
+#          - Path=/api/users/**
+#
+#eureka:
+#  client:
+#    service-url:
+#      defaultZone: http://localhost:8761/eureka/
 server:
   port: 8080
 
 spring:
   application:
     name: api-gateway
+  cloud:
+    gateway:
+      server:
+        webflux:
+          globalcors:
+            cors-configurations:
+              '[/**]':
+                allowedOrigins: "http://localhost:4200"
+                allowedMethods: "*"
+                allowedHeaders: "*"
+                allowCredentials: true
+          routes:
+            - id: user-service
+              uri: lb://USER-SERVICE
+              predicates:
+                - Path=/api/users/**
 
-cloud:
-  gateway:
-    routes:
-      - id: user-service
-        uri: lb://user-service
-        predicates:
-          - Path=/api/users/**
+            - id: application-service
+              uri: lb://APPLICATION-SERVICE
+              predicates:
+                - Path=/api/applications/**
+
+            - id: company-service
+              uri: lb://COMPANY-SERVICE
+              predicates:
+                - Path=/api/companies/**
 
 eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+
+jwt:
+  secret: e5c5wDrXVw5mZWyDqgPCZ5hwG0cfuqJCY5XZ4wuLWEt
+  access-token-expiry: 900000
+  refresh-token-expiry: 604800000
